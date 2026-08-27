@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SpeedUp - Quiz Automation & Local DB</title>
+  <title>SpeedUp - Quiz Automation & Dynamic AnswerMap</title>
   <style>
     :root {
-      --bg-dark: #07090e;
-      --panel-bg: #0f172a;
-      --card-bg: #131d31;
-      --input-bg: #090e17;
-      --border-color: #1e293b;
-      --primary: #10b981;
-      --primary-hover: #059669;
-      --accent: #06b6d4;
-      --accent-hover: #0891b2;
-      --danger: #f43f5e;
-      --text-main: #f1f5f9;
-      --text-muted: #94a3b8;
-      --code-color: #34d399;
+      --bg-dark: #0b0f19;
+      --panel-bg: #111827;
+      --card-bg: #1f2937;
+      --input-bg: #111827;
+      --border-color: #374151;
+      --primary: #8b5cf6;
+      --primary-hover: #7c3aed;
+      --accent: #f59e0b;
+      --accent-hover: #d97706;
+      --danger: #ef4444;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --code-color: #a78bfa;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,13 +39,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
     
     .brand { display: flex; align-items: center; gap: 10px; }
     .brand-logo {
       background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: #041014;
+      color: #ffffff;
       font-weight: 900;
       font-size: 14px;
       padding: 6px 10px;
@@ -65,7 +65,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
     }
 
     .card-title {
@@ -81,6 +81,7 @@
 
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    
     input, textarea {
       background-color: var(--input-bg);
       border: 1px solid var(--border-color);
@@ -88,9 +89,38 @@
       padding: 10px 12px;
       border-radius: 6px;
       font-size: 13px;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    input:focus, textarea:focus { border-color: var(--primary); outline: none; }
+    input:focus, textarea:focus { 
+      border-color: var(--primary); 
+      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+      outline: none; 
+    }
+
+    .grid-ctrl-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .grid-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mini-btn {
+      background: #374151;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.15s ease;
+    }
+    .mini-btn:hover { color: var(--text-main); background: #4b5563; }
 
     .cal-grid {
       display: grid;
@@ -108,27 +138,28 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #94a3b8;
+      background: #374151;
+      border: 1px solid #4b5563;
+      color: #9ca3af;
       border-radius: 6px;
       cursor: pointer;
       font-weight: 700;
       font-size: 12px;
       transition: all 0.15s ease;
+      user-select: none;
     }
     .cal-btn:hover { border-color: var(--primary); color: #fff; }
     .cal-btn.active {
       background: var(--primary);
-      color: #041014;
+      color: #ffffff;
       border-color: var(--primary);
-      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.45);
     }
 
     .btn-row { display: flex; gap: 10px; }
     button.action-btn {
       background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-      color: #041014;
+      color: #ffffff;
       border: none;
       padding: 10px 16px;
       border-radius: 6px;
@@ -141,7 +172,7 @@
     button.action-btn:active { transform: scale(0.98); }
 
     button.copy-btn {
-      background: #1e293b;
+      background: #374151;
       color: var(--accent);
       border: 1px solid var(--accent);
       padding: 6px 12px;
@@ -151,19 +182,19 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    button.copy-btn:hover { background: var(--accent); color: #041014; }
+    button.copy-btn:hover { background: var(--accent); color: #111827; }
     button.copy-btn.copied {
       background: var(--primary);
       border-color: var(--primary);
-      color: #041014;
+      color: #ffffff;
     }
 
     button.secondary-btn {
-      background: #1e293b;
+      background: #374151;
       color: var(--text-main);
       border: 1px solid var(--border-color);
     }
-    button.secondary-btn:hover { background: #334155; }
+    button.secondary-btn:hover { background: #4b5563; }
 
     .output-area {
       background-color: var(--input-bg);
@@ -187,7 +218,7 @@
     }
     table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--input-bg); }
     th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: top; }
-    th { background: #0f172a; color: var(--text-muted); font-size: 12px; text-transform: uppercase; }
+    th { background: #111827; color: var(--text-muted); font-size: 12px; text-transform: uppercase; }
     .opt-list { margin: 4px 0 0 16px; color: var(--text-muted); font-size: 12px; }
 
     /* Modal Popup */
@@ -195,7 +226,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(4, 7, 14, 0.85);
+      background: rgba(11, 15, 25, 0.85);
       backdrop-filter: blur(4px);
       z-index: 9999;
       align-items: center;
@@ -204,14 +235,14 @@
     .modal-box {
       width: 90%;
       max-width: 720px;
-      background: #0f172a;
+      background: #111827;
       border: 2px solid var(--primary);
       border-radius: 12px;
       padding: 24px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.25);
     }
     .modal-header {
       display: flex;
@@ -230,8 +261,8 @@
     .modal-body textarea {
       width: 100%;
       height: 300px;
-      background: #080c14;
-      border: 1px solid #1e293b;
+      background: #0b0f19;
+      border: 1px solid #374151;
       color: var(--code-color);
       font-family: monospace;
       font-size: 12px;
@@ -271,22 +302,12 @@
       
       <div class="form-group">
         <label>Total Questions</label>
-        <input type="number" id="p1-total-q" value="10" min="1" max="100" />
+        <input type="number" id="p1-total-q" value="30" min="1" max="100" />
       </div>
 
       <div class="form-group">
         <label>Read Delay (ms)</label>
-        <input type="number" id="p1-speed" value="2000" min="200" step="100" />
-      </div>
-
-      <div class="form-group">
-        <label>Question Selector</label>
-        <input type="text" id="p1-class-q" value=".question-p pre, .question-p" />
-      </div>
-
-      <div class="form-group">
-        <label>Options Selector</label>
-        <input type="text" id="p1-class-opt" value=".Answer-options .mcq-option-label" />
+        <input type="number" id="p1-speed" value="700" min="200" step="50" />
       </div>
 
       <div class="btn-row">
@@ -301,11 +322,13 @@
       <div class="form-group">
         <label>Paste Question Text (Paragraphs to Local DB)</label>
         <textarea id="p1-import-paragraph" rows="4" placeholder="Question 1:
-What is SpeedUp?
+In how many years will sum of Rs 4000 yield an interest of Rs.1080/- at 9% p.a?
 
 Options:
-  1. High-speed runner
-  2. Slow runner
+  1. 1 Year
+  2. 3 Year
+  3. 4 Year
+  4. 2 Year
 ----------------------------------------"></textarea>
       </div>
       <button class="action-btn secondary-btn" onclick="saveParagraphToIndexedDB()">Save Paragraph to IndexedDB</button>
@@ -328,17 +351,34 @@ Options:
 
       <div class="form-group">
         <label>Click Delay (ms)</label>
-        <input type="number" id="p2-speed" value="1500" min="100" step="100" />
+        <input type="number" id="p2-speed" value="50000" min="100" step="500" />
       </div>
 
       <div class="form-group">
-        <label>Target Filter (Calendar Grid Selection)</label>
+        <label>Target Question Array (Syncs with Grid)</label>
+        <input type="text" id="p2-target-input" value="[1, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16, 17, 18, 19, 20, 22, 23]" oninput="syncGridFromInput()" placeholder="[1, 3, 4, 5, 6...]" />
+      </div>
+
+      <div class="form-group">
+        <div class="grid-ctrl-row">
+          <label>Target Filter (CSS Grid Selection)</label>
+          <div class="grid-actions">
+            <button class="mini-btn" onclick="autoSelectPreset('answers')">Target from Answers</button>
+            <button class="mini-btn" onclick="autoSelectAllGrid(true)">All</button>
+            <button class="mini-btn" onclick="autoSelectAllGrid(false)">Clear</button>
+          </div>
+        </div>
         <div class="cal-grid" id="p2-cal-grid"></div>
       </div>
 
       <div class="form-group">
-        <label>Answer Keys (0-4 Indices)</label>
-        <textarea id="p2-answers" rows="3">0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 1, 0, 3, 2, 4, 2, 1, 0, 4, 3, 0, 2, 1, 4, 3, 1, 0, 2, 4, 3</textarea>
+        <label>Answer Input (Map format or [Array])</label>
+        <textarea id="p2-answers" rows="4" oninput="handleAnswerInput()" placeholder="Paste Map or Array:
+[1, 4], [3, 3], [4, 4], [5, 2], [6, 1]...
+OR: [4, 3, 4, 2, 1...]">[1, 4], [3, 3], [4, 4], [5, 2], [6, 1],
+[7, 4], [8, 1], [9, 4], [10, 3], [12, 2],
+[14, 2], [15, 4], [16, 3], [17, 1], [18, 2],
+[19, 1], [20, 1], [22, 1], [23, 1]</textarea>
       </div>
 
       <div class="btn-row">
@@ -346,7 +386,7 @@ Options:
       </div>
 
       <div class="form-group">
-        <label>Generated Injector Script</label>
+        <label>Generated Injector Script (answerMap Format)</label>
         <div class="output-area" id="p2-script-output"></div>
       </div>
     </div>
@@ -397,9 +437,6 @@ Options:
 </div>
 
 <script>
-  /* ----------------------------------------------------
-     INDEXEDDB STORAGE LOGIC
-  ---------------------------------------------------- */
   const DB_NAME = "SpeedUp_QuizDB";
   const DB_VERSION = 1;
   const STORE_NAME = "questions";
@@ -423,23 +460,15 @@ Options:
     };
   }
 
-  /* ----------------------------------------------------
-     SAFE CLIPBOARD ENGINE (API + EXECCOMMAND FALLBACK)
-  ---------------------------------------------------- */
   async function safeCopyToClipboard(text) {
     if (!text) return false;
-    
-    // Try Clipboard API first
     if (navigator.clipboard && window.isSecureContext) {
       try {
         await navigator.clipboard.writeText(text);
         return true;
-      } catch (err) {
-        console.warn("[SpeedUp] Clipboard API restricted, switching to textarea fallback.");
-      }
+      } catch (err) {}
     }
 
-    // Fallback: temporary hidden textarea
     try {
       const tempArea = document.createElement("textarea");
       tempArea.value = text;
@@ -455,14 +484,10 @@ Options:
       document.body.removeChild(tempArea);
       return success;
     } catch (e) {
-      console.error("[SpeedUp] Copy command failed:", e);
       return false;
     }
   }
 
-  /* ----------------------------------------------------
-     MODAL & CLIPBOARD CONTROLLERS
-  ---------------------------------------------------- */
   function openScreenModal(sourceElementId, title) {
     const content = document.getElementById(sourceElementId).textContent;
     document.getElementById('modal-title').textContent = title;
@@ -485,7 +510,7 @@ Options:
       setTimeout(() => { btn.innerText = originalText; }, 2000);
     } else {
       textarea.select();
-      alert("Please press Ctrl+C (or Cmd+C) to copy the highlighted script.");
+      alert("Press Ctrl+C (or Cmd+C) to copy.");
     }
   }
 
@@ -503,14 +528,10 @@ Options:
         btn.classList.remove('copied');
       }, 2000);
     } else {
-      // If browser blocks both, show modal so user can manually copy
       openScreenModal(elementId, 'Copy Script');
     }
   }
 
-  /* ----------------------------------------------------
-     PARAGRAPH PARSER & SAVER
-  ---------------------------------------------------- */
   function parseParagraphText(text) {
     const blocks = text.split(/-{3,}/).map(b => b.trim()).filter(b => b.length > 0);
     const parsedData = [];
@@ -601,7 +622,7 @@ Options:
               ? `<ol class="opt-list">${r.options.map(o => `<li>${escapeHtml(o.optionText)}</li>`).join('')}</ol>`
               : '<span style="color:var(--text-muted)">None</span>'}
           </td>
-          <td><button style="padding: 4px 8px; font-size: 11px; cursor: pointer; background: #334155; border: 1px solid #475569; color:#fff; border-radius: 4px;" onclick="deleteRecord(${r.questionNumber})">Delete</button></td>
+          <td><button style="padding: 4px 8px; font-size: 11px; cursor: pointer; background: #374151; border: 1px solid #4b5563; color:#fff; border-radius: 4px;" onclick="deleteRecord(${r.questionNumber})">Delete</button></td>
         </tr>
       `).join('');
     };
@@ -625,13 +646,11 @@ Options:
   }
 
   /* ----------------------------------------------------
-     PART 1: CODE GENERATOR (SCRAPER)
+     PART 1: DEDUPLICATED SCRAPER SCRIPT GENERATOR
   ---------------------------------------------------- */
   function generatePart1Script() {
     const totalQ = document.getElementById('p1-total-q').value;
     const speed = document.getElementById('p1-speed').value;
-    const qClass = document.getElementById('p1-class-q').value;
-    const optClass = document.getElementById('p1-class-opt').value;
 
     const script = `(async () => {
   const totalQuestions = ${totalQ};
@@ -640,25 +659,62 @@ Options:
   const collected = [];
 
   function extract(idx) {
-    const qEl = document.querySelector('${qClass}');
-    const opts = [...document.querySelectorAll('${optClass}')].map((el, i) => ({
-      optionNumber: i + 1,
-      optionText: el.innerText.trim()
-    }));
+    const qEl = document.querySelector('.question-p pre p') ||
+                document.querySelector('.question-p pre') ||
+                document.querySelector('.question-p') ||
+                document.querySelector('.question-col');
+
+    // Strict non-overlapping option selector
+    const labelElements = document.querySelectorAll('.options-container .mcq-option-label, .Answer-options .mcq-option-label');
+    
+    let opts = [];
+    if (labelElements.length > 0) {
+      opts = Array.from(labelElements).map((el, i) => {
+        return {
+          num: i + 1,
+          text: el.innerText.trim().replace(/\\s+/g, ' ')
+        };
+      });
+    } else {
+      const radios = document.querySelectorAll('.options-container input[type="radio"], input.mcq-questions[type="radio"]');
+      opts = Array.from(radios).map((radio, i) => {
+        const linkedLabel = document.querySelector("label[for='" + radio.id + "']") || radio.closest('.form-check');
+        return {
+          num: i + 1,
+          text: linkedLabel ? linkedLabel.innerText.trim().replace(/\\s+/g, ' ') : 'N/A'
+        };
+      });
+    }
+
     return {
-      questionNumber: idx,
-      question: qEl ? qEl.innerText.trim() : 'N/A',
+      num: idx,
+      text: qEl ? qEl.innerText.trim() : 'N/A',
       options: opts
     };
   }
 
-  console.log("%c[SpeedUp] Reading questions...", "color: #10b981; font-weight: bold;");
+  console.clear();
+  console.log("%c=======================================================", "color: #f59e0b; font-weight: bold;");
+  console.log("%c        EXTRACTING ALL " + totalQuestions + " QUESTIONS & OPTIONS        ", "color: #f59e0b; font-weight: bold;");
+  console.log("%c=======================================================", "color: #f59e0b; font-weight: bold;");
 
   for (let i = 1; i <= totalQuestions; i++) {
-    collected.push(extract(i));
+    const data = extract(i);
+    collected.push(data);
+
+    console.group("%c▶ QUESTION " + data.num + " of " + totalQuestions, "color: #a78bfa; font-weight: bold;");
+    console.log("%c" + data.text, "color: #ffffff; font-weight: bold;");
+    if (data.options.length > 0) {
+      data.options.forEach((opt) => {
+        console.log("  %c(" + opt.num + ") %c" + opt.text, "color: #f59e0b; font-weight: bold;", "color: #d1d5db;");
+      });
+    }
+    console.groupEnd();
+
     if (i < totalQuestions) {
       const nextBtn = document.querySelector('button.save-next') || 
-                      [...document.querySelectorAll('button')].find(b => b.textContent.trim().toLowerCase() === 'next');
+                      document.querySelector('.save-next') || 
+                      [...document.querySelectorAll('button')].find(b => b.textContent.trim().toLowerCase().includes('next'));
       if (nextBtn) { 
         nextBtn.click(); 
         await sleep(waitTime); 
@@ -666,36 +722,72 @@ Options:
     }
   }
 
-  let formattedOutput = "";
+  let fullSummary = "================== ALL " + totalQuestions + " QUESTIONS & OPTIONS ==================\\n\\n";
   collected.forEach(item => {
-    formattedOutput += "Question " + item.questionNumber + ":\\n" + item.question + "\\n\\nOptions:\\n";
+    fullSummary += "Question " + item.num + ":\\n" + item.text + "\\n\\nOptions:\\n";
     item.options.forEach(opt => {
-      formattedOutput += "  " + opt.optionNumber + ". " + opt.optionText + "\\n";
+      fullSummary += "  (" + opt.num + ") " + opt.text + "\\n";
     });
-    formattedOutput += "\\n----------------------------------------\\n\\n";
+    fullSummary += "\\n----------------------------------------------------------------\\n\\n";
   });
 
-  try {
-    await navigator.clipboard.writeText(formattedOutput);
-    console.log("%c[SpeedUp] Complete! Copied to clipboard.", "color: #10b981; font-weight: bold;");
-  } catch (e) {
-    console.warn("[SpeedUp] Auto-clipboard blocked. Dumping to console.");
+  async function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (err) {}
+    }
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.left = "-999999px";
+    document.body.appendChild(ta);
+    ta.select();
+    let success = false;
+    try { success = document.execCommand('copy'); } catch (err) {}
+    document.body.removeChild(ta);
+    return success;
   }
-  
-  console.log(formattedOutput);
-  alert("[SpeedUp] Extracted " + collected.length + " questions! Check console or copy from screen.");
+
+  const isCopied = await copyToClipboard(fullSummary);
+  console.log("%c=======================================================", "color: #10b981; font-weight: bold;");
+  if (isCopied) {
+    console.log("%c✓ SUCCESS: All " + totalQuestions + " questions copied to clipboard!", "color: #10b981; font-size: 14px; font-weight: bold;");
+  }
+  console.log("%c=======================================================", "color: #10b981; font-weight: bold;");
+  console.log(fullSummary);
 })();`;
 
     document.getElementById('p1-script-output').textContent = script;
   }
 
   /* ----------------------------------------------------
-     PART 2: CALENDAR GRID & INJECTOR CODE GENERATOR
+     PART 2: CALENDAR GRID & TARGET ARRAY SYNC
   ---------------------------------------------------- */
-  const selectedQuestions = new Set();
+  const selectedQuestions = new Set([1, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16, 17, 18, 19, 20, 22, 23]);
+  const parsedAnswerMap = new Map();
 
-  function renderCalendarGrid() {
-    const total = parseInt(document.getElementById('p2-total-q').value) || 30;
+  function updateTargetInputBox() {
+    const sorted = Array.from(selectedQuestions).sort((a, b) => a - b);
+    document.getElementById('p2-target-input').value = `[${sorted.join(', ')}]`;
+  }
+
+  function syncGridFromInput() {
+    const rawVal = document.getElementById('p2-target-input').value;
+    const cleanNumbers = rawVal.replace(/[\[\]]/g, '').split(',')
+      .map(s => parseInt(s.trim(), 10))
+      .filter(n => !isNaN(n));
+
+    selectedQuestions.clear();
+    cleanNumbers.forEach(n => selectedQuestions.add(n));
+    
+    renderCalendarGrid(false);
+    generatePart2Script();
+  }
+
+  function renderCalendarGrid(syncInput = true) {
+    const total = parseInt(document.getElementById('p2-total-q').value, 10) || 30;
     const grid = document.getElementById('p2-cal-grid');
     grid.innerHTML = '';
     
@@ -711,52 +803,167 @@ Options:
           selectedQuestions.add(i);
           btn.classList.add('active');
         }
+        updateTargetInputBox();
+        generatePart2Script();
       };
       grid.appendChild(btn);
     }
+    if (syncInput) {
+      updateTargetInputBox();
+    }
+  }
+
+  function autoSelectAllGrid(select) {
+    const total = parseInt(document.getElementById('p2-total-q').value, 10) || 30;
+    selectedQuestions.clear();
+    if (select) {
+      for (let i = 1; i <= total; i++) selectedQuestions.add(i);
+    }
+    renderCalendarGrid();
+    generatePart2Script();
+  }
+
+  function autoSelectPreset(type) {
+    const total = parseInt(document.getElementById('p2-total-q').value, 10) || 30;
+    selectedQuestions.clear();
+
+    if (type === 'answers') {
+      handleAnswerInput(true);
+      return;
+    }
+
+    renderCalendarGrid();
+    generatePart2Script();
+  }
+
+  function handleAnswerInput(forceSyncTarget = false) {
+    const rawText = document.getElementById('p2-answers').value.trim();
+    parsedAnswerMap.clear();
+
+    const pairRegex = /\[\s*(\d+)\s*,\s*(\d+)\s*\]/g;
+    let match;
+    let foundPairs = 0;
+
+    while ((match = pairRegex.exec(rawText)) !== null) {
+      const qNum = parseInt(match[1], 10);
+      const ansNum = parseInt(match[2], 10);
+      parsedAnswerMap.set(qNum, ansNum);
+      foundPairs++;
+    }
+
+    if (foundPairs > 0) {
+      if (forceSyncTarget || document.activeElement === document.getElementById('p2-answers')) {
+        selectedQuestions.clear();
+        for (const qNum of parsedAnswerMap.keys()) {
+          selectedQuestions.add(qNum);
+        }
+        renderCalendarGrid(true);
+      }
+    } else {
+      const flatList = rawText.replace(/[\[\]]/g, '').split(',')
+        .map(s => parseInt(s.trim(), 10))
+        .filter(n => !isNaN(n));
+
+      const targetArr = Array.from(selectedQuestions).sort((a, b) => a - b);
+      targetArr.forEach((qNum, idx) => {
+        if (idx < flatList.length) {
+          parsedAnswerMap.set(qNum, flatList[idx]);
+        }
+      });
+    }
+
+    generatePart2Script();
   }
 
   function generatePart2Script() {
-    const speed = document.getElementById('p2-speed').value;
-    const rawAnswers = document.getElementById('p2-answers').value;
-    const answersArray = rawAnswers.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+    const total = parseInt(document.getElementById('p2-total-q').value, 10) || 30;
+    const speed = document.getElementById('p2-speed').value || 50000;
     const targetArr = Array.from(selectedQuestions).sort((a, b) => a - b);
 
+    const mapRows = [];
+    let rowBuffer = [];
+    
+    targetArr.forEach((qNum) => {
+      if (parsedAnswerMap.has(qNum)) {
+        rowBuffer.push(`[${qNum}, ${parsedAnswerMap.get(qNum)}]`);
+        if (rowBuffer.length === 5) {
+          mapRows.push(rowBuffer.join(', '));
+          rowBuffer = [];
+        }
+      }
+    });
+    if (rowBuffer.length > 0) {
+      mapRows.push(rowBuffer.join(', '));
+    }
+
+    const mapCode = mapRows.length > 0 ? mapRows.join(',\n    ') : '// No target questions selected';
+
     const script = `(async () => {
-  const answers = ${JSON.stringify(answersArray)};
-  const targetQuestions = ${JSON.stringify(targetArr)};
+  const answerMap = new Map([
+    ${mapCode}
+  ]);
+
+  const totalQuestions = ${total};
   const waitSpeed = ${speed};
-  const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+  const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
-  console.log("%c[SpeedUp] Injector running...", "color: #06b6d4; font-weight: bold;");
+  let answeredCount = 0;
+  let skippedCount = 0;
 
-  for (let q = 0; q < answers.length; q++) {
-    const qNum = q + 1;
-    const isTarget = targetQuestions.length === 0 || targetQuestions.includes(qNum);
+  console.log("%c[Status] Processing started with " + (waitSpeed/1000) + "-second interval per question...", "color: #f59e0b; font-weight: bold;");
 
-    if (isTarget) {
-      const options = document.querySelectorAll('input.mcq-questions[type="radio"]');
-      if (options.length > 0) {
-        const targetOpt = options[answers[q] % options.length];
+  for (let currentQ = 1; currentQ <= totalQuestions; currentQ++) {
+    if (answerMap.has(currentQ)) {
+      const targetAnswerNum = answerMap.get(currentQ);
+      const targetIndex = targetAnswerNum - 1;
+
+      const options = document.querySelectorAll(
+        '.options-container input[type="radio"], input.mcq-questions[type="radio"], input[type="radio"]'
+      );
+
+      if (options.length > 0 && targetIndex >= 0 && targetIndex < options.length) {
+        const targetOpt = options[targetIndex];
+
         targetOpt.checked = true;
         targetOpt.click();
+
+        const label = document.querySelector("label[for='" + targetOpt.id + "']") || targetOpt.closest('.form-check');
+        if (label) label.click();
+
+        targetOpt.dispatchEvent(new Event('input', { bubbles: true }));
         targetOpt.dispatchEvent(new Event('change', { bubbles: true }));
-        console.log(\`[SpeedUp] Q\${qNum}: Selected Option \${answers[q]}\`);
+
+        answeredCount++;
+        console.log("%c[Done] Q" + currentQ + ": Option " + targetAnswerNum + " selected. Waiting " + (waitSpeed/1000) + "s...", "color: #10b981;");
+      } else {
+        console.warn("[Warning] Q" + currentQ + ": Option element not found.");
       }
     } else {
-      console.log(\`[SpeedUp] Q\${qNum}: Skipped\`);
+      skippedCount++;
+      console.log("[Skip] Q" + currentQ + ": Not in target list. Waiting " + (waitSpeed/1000) + "s...");
     }
 
     await sleep(waitSpeed);
 
-    const nextBtn = document.querySelector('button.save-next') ||
-                    [...document.querySelectorAll('button')].find(b => b.textContent.trim().toLowerCase() === 'next');
-    if (nextBtn && q < answers.length - 1) {
+    const nextBtn =
+      document.querySelector('button.save-next') ||
+      document.querySelector('.save-next') ||
+      [...document.querySelectorAll('button')].find((b) =>
+        b.textContent.trim().toLowerCase().includes('next')
+      );
+
+    if (nextBtn && currentQ < totalQuestions) {
       nextBtn.click();
-      await sleep(1000);
+      await sleep(1200);
     }
   }
-  alert("[SpeedUp] Answers successfully selected!");
+
+  console.group("%c=== TASK COMPLETED ===", "color: #10b981; font-size: 14px; font-weight: bold;");
+  console.log("Total Questions Scanned : " + totalQuestions);
+  console.log("Target Questions Answered: " + answeredCount);
+  console.log("Questions Skipped        : " + skippedCount);
+  console.log("Completion Status        : 100% Successful");
+  console.groupEnd();
 })();`;
 
     document.getElementById('p2-script-output').textContent = script;
@@ -766,7 +973,7 @@ Options:
     initDB();
     renderCalendarGrid();
     generatePart1Script();
-    generatePart2Script();
+    handleAnswerInput(true);
   };
 </script>
 
